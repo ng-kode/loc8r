@@ -37,7 +37,24 @@ module.exports.locationInfo = (req, res, next) => {
         rating: 3,
         facilities: [ 'Hot drinks', 'Food', 'Premium wifi'],
         distance: '100m',
-        hours: [ 'Monday - Friday : 7:00am - 7:00pm', "Saturday : 8:00am - 5:00pm", "Sunday : closed" ],
+        openingTimes: [
+            {
+                days: 'Monday - Friday',
+                opening: '7:00am',
+                closing: '7:00pm',
+                closed: false
+            },
+            {
+                days: 'Saturday',
+                opening: '8:00am',
+                closing: '5:00pm',
+                closed: false
+            },
+            {
+                days: 'Sunday',
+                closed: true
+            },
+        ],
         mapLink: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d14764.396703283839!2d114.18555039751222!3d22.31208868261436!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x340400e196516635%3A0x3fcd21c76c5a5ca4!2zU3RhcmJ1Y2tzIENvZmZlZSDmmJ_lt7TlhYs!5e0!3m2!1sen!2shk!4v1516712487947",
         reviews: [
             {
