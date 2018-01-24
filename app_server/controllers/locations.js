@@ -31,6 +31,9 @@ module.exports.homelist = (req, res, next) => {
 };
 
 module.exports.locationInfo = (req, res, next) => {
+    const monthArr = ["Nothing", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+    const d1 = new Date(2018, 1, 23)
+    const d2 = new Date(2017, 7, 11)
     res.render('location-info', {
         name: 'Starcups',
         address: '125 High Street, Reading, RG6 1PS',
@@ -60,13 +63,13 @@ module.exports.locationInfo = (req, res, next) => {
             {
                 rating: 5,
                 author: "Samantha Thavasa",
-                timestamp: "23 January 2018",
+                createdOn: `${d1.getDate()} ${monthArr[d1.getMonth()]} ${d1.getFullYear()}`,
                 text: "Great great place to have a chat with Victoria Harbour near you !"
             },
             {
                 rating: 3,
                 author: "Ted Baker",
-                timestamp: "11 July 2017",
+                createdOn: `${d2.getDate()} ${monthArr[d2.getMonth()]} ${d2.getFullYear()}`,
                 text: "Coffee as crappy as usual by the view is nice"
             }
         ],
