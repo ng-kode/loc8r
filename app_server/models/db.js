@@ -5,7 +5,6 @@ const locations = require('./locations');
 // Make Connection
 let dbURI = "mongodb://localhost/Loc8r";
 if (process.env.NODE_ENV === 'production') {
-    console.log(process.env);
     dbURI = process.env.MONGODB_URI;
 }
 mongoose.connect(dbURI)
