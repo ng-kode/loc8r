@@ -1,5 +1,13 @@
+// Import Schemas
 const mongoose = require('mongoose');
-const dbURI = "mongodb://localhost/Loc8r";
+const locations = require('./locations');
+
+// Make Connection
+let dbURI = "mongodb://localhost/Loc8r";
+if (process.env.NODE_ENV === 'production') {
+    console.log(process.env);
+    dbURI = process.env.MONGODB_URI;
+}
 mongoose.connect(dbURI)
 
 mongoose.connection.on('connected', () => {
@@ -15,7 +23,6 @@ mongoose.connection.on('disconnected', () => {
 });
 
 // cut db connection before nodemon restart/app termination/Heroku app shutdown
-
 const gracefulShutdown = (msg, cb) => {
     mongoose.connection.close(() => {
         console.log("Mongoose disconnected through ", msg)
