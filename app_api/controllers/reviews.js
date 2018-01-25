@@ -9,7 +9,7 @@ const reviewsReadOne = (req, res, next) => {
     if (req.params && req.params.locationid && req.params.reviewid) {
         Loc.findById(req.params.locationid).select('name reviews').exec((err, location) => {
             if (err) {
-                console.log("\n---------- ERROR START ----------\n\n", err, "\n\n---------- ERROR END ----------\n\n");
+                console.log("\nERROR\n", err);
                 res.status(404).json({ "message": "Sorry, we have an internal error at the moment, working on it." })
                 return;
             }
