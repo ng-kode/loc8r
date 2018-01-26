@@ -10,7 +10,6 @@ if (process.env.NODE_ENV === 'production') {
 
 const renderHomepage = (req, res, body) => {
     res.render('locations-list', {
-        _id: body._id,
         title: 'Loc8r - find a place to work with wifi',
         pageHeader: {
           title: 'Loc8r',
@@ -40,21 +39,7 @@ const homelist = (req, res, next) => {
     })
 };
 
-const renderDetailPage = (req, res, body) => {
-    res.render('location-info', {
-        name: body.name,
-        address: body.address,
-        rating: 3,
-        facilities: body.facilities,
-        openingTimes: body.openingTimes,
-        coords: { lng: body.coords[0], lat: body.coords[1] },
-        reviews: body.reviews,
-        summaryLead: "Simon's cafe is on Loc8r because it has accessible wifi and space to sit down with your laptop and get some work done.",
-        summary: "If you've been and you like it - or if you don't - please leave a review to help other people just like you."
-    })
-}
-
-const locationInfo = (req, res, next) => {
+const getLocationInfo = (req, res, callback) => {
     const options = {
         url: apiOptions.server + 'api/locations/' + req.params.locationid,
         method: "GET",
@@ -64,18 +49,73 @@ const locationInfo = (req, res, next) => {
     request(options, (err, response, body) => {
         if (err) { return utils.customError(err, res) }
         if (response.statusCode != 200) { return utils.customError(body, res, false) }
-        return renderDetailPage(req, res, body)
+
+        let data = body
+        data.lng = body.coords[0]
+        data.lat = body.coords[1]
+        callback(req, res, data)
+    })
+};
+
+const renderDetailPage = (req, res, data) => {
+    res.render('location-info', {
+        _id: data._id,
+        name: data.name,
+        address: data.address,
+        rating: 3,
+        facilities: data.facilities,
+        openingTimes: data.openingTimes,
+        lng: data.lng,
+        lat: data.lat,
+        reviews: data.reviews,
+        summaryLead: "Simon's cafe is on Loc8r because it has accessible wifi and space to sit down with your laptop and get some work done.",
+        summary: "If you've been and you like it - or if you don't - please leave a review to help other people just like you."
+    })
+}
+
+const locationInfo = (req, res, next) => {
+    getLocationInfo(req, res, (req, res, data) => {
+        renderDetailPage(req, res, data)
+    })
+}
+
+const renderReviewForm = (req, res, data) => {
+    res.render('location-review-form', {
+        title: `Review on ${data.name}`
+    })
+}
+
+const addReview = (req, res, next) => {
+    getLocationInfo(req, res, (req, res, data) => {
+        renderReviewForm(req, res, data)
     })
 
 };
 
-const addReview = (req, res, next) => {
-    res.render('location-review-form', {title: 'Add Review'})
-};
+const doAddReview = (req, res, next) => {
+    console.log(req.body);
+    const options = {
+        url: apiOptions.server + `api/locations/${req.params.locationid}/reviews`,
+        method: "POST",
+        json: {
+            author: req.body.name,
+            rating: parseFloat(req.body.rating),
+            reviewText: req.body.reviewText
+        }
+    }
+    request(options, (err, response, body) => {
+        if (err) return utils.customError(err, res);
+        if (response.statusCode != 201) return utils.customError(body, res, false);
+        if (response.statusCode == 201) {
+            return res.redirect(`/locations/${req.params.locationid}`)
+        }
+    })
+}
 
 
 module.exports = {
     homelist,
     locationInfo,
-    addReview
+    addReview,
+    doAddReview
 };

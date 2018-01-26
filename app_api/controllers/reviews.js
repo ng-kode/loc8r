@@ -31,7 +31,7 @@ const doAddReview = (req, res, next, location) => {
         }
         doSetAverageRating(location)
         const thisReview = location.reviews[location.reviews.length - 1]
-        return res.status(200).json(thisReview)
+        return res.status(201).json(thisReview)
     })
 }
 

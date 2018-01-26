@@ -59,7 +59,7 @@ const locationsCreate = (req, res, next) => {
         if (err) {
             return utils.customError(err, res);
         }
-        return res.status(200).json(location)
+        return res.status(201).json(location)
     })
 };
 
