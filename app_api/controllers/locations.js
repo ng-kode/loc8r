@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const Loc = mongoose.model('Location');
-
+const utils = require('./utils');
 
 const locationsListByDistance = (req, res, next) => {
     const lng = parseFloat(req.query.lng)
@@ -21,8 +21,7 @@ const locationsListByDistance = (req, res, next) => {
     }
     Loc.aggregate([{ $geoNear: geoOptions }], (err, results, stats) => {
         if (err) {
-            console.log("\nERROR\n", err);
-            return res.status(404).json({ "message": "Sorry, internal error" })
+            return utils.customError(err, res);
         }
         console.log("\n results \n", results);
         const locations = results.map(o => {
@@ -59,12 +58,7 @@ const locationsCreate = (req, res, next) => {
         }],
     }, (err, location) => {
         if (err) {
-            console.log("\nERROR\n", err);
-            if (err.name == "ValidationError") {
-                return res.status(404).json({ "message": err.message })
-            } else {
-                return res.status(404).json({ "message": "Sorry, internal error" })
-            }
+            return utils.customError(err, res);
         }
         return res.status(200).json(location)
     })
@@ -73,17 +67,10 @@ const locationsCreate = (req, res, next) => {
 const locationsReadOne = (req, res, next) => {
     if (req.params && req.params.locationid) {
         Loc.findById(req.params.locationid).exec((err, location) => {
-            if (err) {
-                console.log("\nERROR\n", err);
-                res.status(404).json({ "message": "Sorry, we have an internal error at the moment, working on it." })
-                return;
-            }
-            if (!location) {
-                res.status(404).json({ "message": "Location id not found" })
-                return;
-            }
-            res.status(200).json(location);
-            return;
+            if (err) return utils.customError(err, res);
+            if (!location) return res.status(404).json({ "message": "Location id not found" });
+
+            return res.status(200).json(location);
         })
     } else {
         res.status(404).json({ "message": "No location id in request" });
@@ -91,7 +78,45 @@ const locationsReadOne = (req, res, next) => {
 };
 
 const locationsUpdateOne = (req, res, next) => {
+    if (req.params && req.params.locationid) {
+        Loc.findById(req.params.locationid).select('-review -rating').exec((err, location) => {
+            if (err) return utils.customError(err, res);
+            if (!location) return res.status(404).json({ "message": "Location id not found" });
 
+            if (req.body.name) location.name = req.body.name;
+            if (req.body.address) location.address = req.body.address;
+            if (req.body.facilities) location.facilities = req.body.facilities.split(",");
+            if (req.body.lng && req.body.lat) location.coords = [ req.body.lng, req.body.lat ];
+            let openingTimes = []
+            if (req.body.days1 && req.body.closed1) {
+                let obj = {
+                    days: req.body.days1,
+                    closed: req.body.closed1
+                }
+                if (req.body.opening1) obj.opening = req.body.opening1;
+                if (req.body.closing1) obj.closing = req.body.closing1;
+                openingTimes.push(obj);
+            }
+            if (req.body.days2 && req.body.closed2) {
+                let obj = {
+                    days: req.body.days2,
+                    closed: req.body.closed2
+                }
+                if (req.body.opening2) obj.opening = req.body.opening2;
+                if (req.body.closing2) obj.closing = req.body.closing2;
+                openingTimes.push(obj);
+            }
+            if (openingTimes.length > 0) location.openingTimes =  openingTimes;
+
+            // commiting changes to database
+            location.save((err, location) => {
+                if (err) return utils.customError(err, res);
+                return res.status(200).json(location);
+            })
+        })
+    } else {
+        res.status(404).json({ "message": "locationid is required in url" });
+    }
 };
 
 const locationsDeleteOne = (req, res, next) => {
