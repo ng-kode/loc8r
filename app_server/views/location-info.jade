@@ -36,13 +36,14 @@ block content
                         .panel-heading
                             h3.panel-title Location map
                         .panel-body
-                            .embed-responsive.embed-responsive-4by3
-                                iframe.embed-responsive-item(src=mapLink)
+                            .thumbnail
+                                img(src='http://maps.googleapis.com/maps/api/staticmap?center=' + coords.lat + ',' + coords.lng + '&zoom=17&size=400x350&sensor=false&markers=' + coords.lat + ',' + coords.lng + '&scale=2')
+
             .row
                 .col-xs-12
                     .panel.panel-primary.review-panel
                         .panel-heading
-                            a.btn.btn-default.pull-right(href='/location/review/new') Add Review
+                            a.btn.btn-default.pull-right(href='/locations/#{_id}/reviews/new') Add Review
                             h3.panel-title Customer reviews
                         .panel-body.review-container
                             each review in reviews
@@ -56,7 +57,7 @@ block content
                                             &nbsp;
                                             small.reviewTimestamp= review.timestamp
                                         .col-xs-12
-                                            p= review.text
+                                            p= review.reviewText
         .col-xs-12.col-md-3
             p.lead= summaryLead
             p= summary

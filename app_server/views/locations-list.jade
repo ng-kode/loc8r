@@ -13,7 +13,7 @@ block content
             .row.list-group
                 if locations.length
                     each location in locations
-                        a.col-xs-12.list-group-item(href="/location")
+                        a.col-xs-12.list-group-item(href="/locations/#{location._id}")
                             h3= location.name
                             small &nbsp;
                                 +outputRating(location.rating)                       
