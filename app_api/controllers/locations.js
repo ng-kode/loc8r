@@ -120,7 +120,17 @@ const locationsUpdateOne = (req, res, next) => {
 };
 
 const locationsDeleteOne = (req, res, next) => {
+    if (!req.params.locationid) return res.status(404).json({ "message": "location id is required in url" })
 
+    Loc.findById(req.params.locationid).exec((err, location) => {
+        if (err) return utils.customError(err, res);
+        if (!location) return res.status(404).json({ "message": "location not found" })
+
+        location.remove((err, location) => {
+            if (err) return utils.customError(err, res);
+            res.status(200).json({ deleted: location }); // can also do status 204 to give a no-content response
+        })
+    })
 };
 
 module.exports = {

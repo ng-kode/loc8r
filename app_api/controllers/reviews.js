@@ -86,7 +86,23 @@ const reviewsUpdateOne = (req, res, next) => {
 };
 
 const reviewsDeleteOne = (req, res, next) => {
+    if (!req.params.locationid || !req.params.reviewid) return res.status(404).json({ "message": "Both locationid and reviewid are required in url" })
 
+    Loc.findById(req.params.locationid).select('reviews').exec((err, location) => {
+        if (err) return utils.customError(err, res);
+        if (!location) return res.status(404).json({ "message": "Location not found" });
+        if ((location && !location.reviews) || (location && location.reviews.length <= 0)) {
+            return res.status(404).json({ "message": "Reviews of this Location id not found" });
+        }
+        if (!location.reviews.id(req.params.reviewid)) return res.status(404).json({ "message": "Review not found" });
+
+        location.reviews.id(req.params.reviewid).remove();
+        location.save((err, location) => {
+            if (err) return utils.customError(err, res);
+            doSetAverageRating(location);
+            return res.status(200).json({ "message": `Review ${req.params.reviewid} deleted` })
+        })
+    })
 };
 
 module.exports = {
