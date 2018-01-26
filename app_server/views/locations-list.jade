@@ -11,17 +11,21 @@ block content
     .row
         .col-xs-12.col-sm-8
             .row.list-group
-                each location in locations
-                    a.col-xs-12.list-group-item(href="/location")
-                        h3= location.name
-                        small &nbsp;
-                            +outputRating(location.rating)                       
-                            span.badge.pull-right.badge-default= location.distance
-                        p.address= location.address
-                        p
-                            each facility in location.facilities
-                                span.label.label-warning= facility
-                                &nbsp;
+                if locations.length
+                    each location in locations
+                        a.col-xs-12.list-group-item(href="/location")
+                            h3= location.name
+                            small &nbsp;
+                                +outputRating(location.rating)                       
+                                span.badge.pull-right.badge-default #{Math.round(location.distance.calculated)}m
+                            p.address= location.address
+                            p
+                                each facility in location.facilities
+                                    span.label.label-warning= facility
+                                    &nbsp;
+                else
+                    p No wifi spots nearby
+                
           
         .col-xs-12.col-sm-4
             p.lead= sidebar

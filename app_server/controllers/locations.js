@@ -1,36 +1,45 @@
-module.exports.homelist = (req, res, next) => {
+const request = require('request');
+const utils = require('./utils');
+
+let apiOptions = {
+    server: "http://localhost:3000/"
+}
+if (process.env.NODE_ENV === 'production') {
+    apiOptions.server = "https://vast-fjord-68640.herokuapp.com/"
+}
+
+const renderHomepage = (req, res, body) => {
     res.render('locations-list', {
         title: 'Loc8r - find a place to work with wifi',
         pageHeader: {
           title: 'Loc8r',
           strapline: 'Find places to work with wifi near you!'
         },
-        locations: [
-          {
-            name: 'Starcups',
-            address: '125 High Street, Reading, RG6 1PS',
-            rating: 3,
-            facilities: [ 'Hot drinks', 'Food', 'Premium wifi'],
-            distance: '100m'
-          }, {
-            name: 'Cafe Hero',
-            address: '125 High Street, Reading, RG6 1PS',
-            rating: 4,
-            facilities: [ 'Hot drinks', 'Food', 'Premium wifi'],
-            distance: '200m'
-          }, {
-            name: 'Burger Queen',
-            address: '125 High Street, Reading, RG6 1PS',
-            rating: 2,
-            facilities: ['Food', 'Premium wifi'],
-            distance: '250m'
-          }
-        ],
+        locations: body,
         sidebar: "Looking for wifi and a seat? Loc8r helps you find places to work when out and about. Perhaps with coffee, cake or a pint? Let Loc8r help you find the place you're looking for."
+    })
+}
+
+const homelist = (req, res, next) => {
+    const options = {
+        url: apiOptions.server + 'api/locations',
+        method: "GET",
+        json: {},
+        qs: {
+            lng: 114.188880,
+            lat: 22.301462,
+            maxDistance: 1000
+        }
+    }
+    request(options, (err, response, body) => {
+        if (err) { return utils.customError(err, res) };
+        if (response.statusCode != 200) {  return utils.customError(body, res, false) };
+
+        renderHomepage(req, res, body);
     })
 };
 
-module.exports.locationInfo = (req, res, next) => {
+const locationInfo = (req, res, next) => {
     res.render('location-info', {
         name: 'Starcups',
         address: '125 High Street, Reading, RG6 1PS',
@@ -75,6 +84,13 @@ module.exports.locationInfo = (req, res, next) => {
     })
 };
 
-module.exports.addReview = (req, res, next) => {
+const addReview = (req, res, next) => {
     res.render('location-review-form', {title: 'Add Review'})
+};
+
+
+module.exports = {
+    homelist,
+    locationInfo,
+    addReview
 };

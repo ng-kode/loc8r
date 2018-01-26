@@ -5,9 +5,9 @@ const utils = require('./utils');
 const locationsListByDistance = (req, res, next) => {
     const lng = parseFloat(req.query.lng)
     const lat = parseFloat(req.query.lat)
-    if ((!lng && lng != 0) || (!lat && lat != 0)) {
-        return res.status(404).json({ "message": "Lng & Lat required in url query" })
-    }
+    const maxDistance = parseFloat(req.query.maxDistance)
+    if ((!lng && lng != 0) || (!lat && lat != 0) || (!maxDistance && maxDistance != 0))  return res.status(404).json({ "message": "lng, lat and maxDistance required in url query" })
+
     const point = {
         type: "Point",
         coordinates: [ lng, lat ]
@@ -15,7 +15,7 @@ const locationsListByDistance = (req, res, next) => {
     const geoOptions = {
         near: point,
         spherical: true,
-        maxDistance: 1000,
+        maxDistance,
         distanceField: "dist.calculated",
         num: 5
     }
@@ -23,7 +23,6 @@ const locationsListByDistance = (req, res, next) => {
         if (err) {
             return utils.customError(err, res);
         }
-        console.log("\n results \n", results);
         const locations = results.map(o => {
             return {
                 distance: o.dist,
