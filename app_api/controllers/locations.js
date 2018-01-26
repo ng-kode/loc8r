@@ -40,7 +40,6 @@ const locationsListByDistance = (req, res, next) => {
 };
 
 const locationsCreate = (req, res, next) => {
-    console.log(req.body);
     Loc.create({
         name: req.body.name,
         address: req.body.address,
