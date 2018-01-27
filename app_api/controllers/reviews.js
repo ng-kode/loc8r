@@ -6,10 +6,15 @@ const doSetAverageRating = location => {
     if (!location) {
         return res.status(404).json({ "message": "Location not found" });
     }
-    const avgRating = location.reviews.map(o => o.rating).reduce((acc, val) => acc + val) / location.reviews.length;
-    location.rating = avgRating;
+    if (location.reviews.length > 0) {
+        const avgRating = location.reviews.map(o => o.rating).reduce((acc, val) => acc + val) / location.reviews.length;
+        location.rating = avgRating;
+    } else {
+        location.rating = 0;
+    }
+
     location.save((err, location) => {
-        if (err) return utils.customError(err, res);
+        if (err) return utils.customError(err, 400, res);
         return console.log(`Average Rating of Location ${location._id} updated`);
     })
 }
@@ -27,7 +32,7 @@ const doAddReview = (req, res, next, location) => {
     })
     location.save((err, location) => {
         if (err) {
-            return utils.customError(err, res)
+            return utils.customError(err, 400, res)
         }
         doSetAverageRating(location)
         const thisReview = location.reviews[location.reviews.length - 1]
@@ -38,7 +43,7 @@ const doAddReview = (req, res, next, location) => {
 const reviewsCreate = (req, res, next) => {
     if (req.params && req.params.locationid) {
         Loc.findById(req.params.locationid).exec((err, location) => {
-            if (err) return utils.customError(err, res);
+            if (err) return utils.customError(err, 400, res);
             doAddReview(req, res, next, location);
         })
     } else {
@@ -49,7 +54,7 @@ const reviewsCreate = (req, res, next) => {
 const reviewsReadOne = (req, res, next) => {
     if (req.params && req.params.locationid && req.params.reviewid) {
         Loc.findById(req.params.locationid).select('name reviews').exec((err, location) => {
-            if (err) return utils.customError(err, res);
+            if (err) return utils.customError(err, 400, res);
             if (!location) return res.status(404).json({ "message": "Location not found" });
             if ((location && !location.reviews) || (location && location.reviews.length <= 0)) {
                 return res.status(404).json({ "message": "Reviews of this Location id not found" });
@@ -66,7 +71,7 @@ const reviewsReadOne = (req, res, next) => {
 
 const reviewsUpdateOne = (req, res, next) => {
     Loc.findById(req.params.locationid).select('reviews').exec((err, location) => {
-        if (err) return utils.customError(err, res);
+        if (err) return utils.customError(err, 400, res);
         if (!location) return res.status(404).json({ "message": "Location not found" });
         if ((location && !location.reviews) || (location && location.reviews.length <= 0)) {
             return res.status(404).json({ "message": "Reviews of this Location id not found" });
@@ -78,7 +83,7 @@ const reviewsUpdateOne = (req, res, next) => {
         if (req.body.rating) thisReview.rating = req.body.rating;
         if (req.body.reviewText) thisReview.reviewText = req.body.reviewText;
         location.save((err, location) => {
-            if (err) return utils.customError(err, res);
+            if (err) return utils.customError(err, 400, res);
             doSetAverageRating(location);
             return res.status(200).json(location.reviews[location.reviews.length - 1])
         })
@@ -89,7 +94,7 @@ const reviewsDeleteOne = (req, res, next) => {
     if (!req.params.locationid || !req.params.reviewid) return res.status(404).json({ "message": "Both locationid and reviewid are required in url" })
 
     Loc.findById(req.params.locationid).select('reviews').exec((err, location) => {
-        if (err) return utils.customError(err, res);
+        if (err) return utils.customError(err, 400, res);
         if (!location) return res.status(404).json({ "message": "Location not found" });
         if ((location && !location.reviews) || (location && location.reviews.length <= 0)) {
             return res.status(404).json({ "message": "Reviews of this Location id not found" });
@@ -98,9 +103,9 @@ const reviewsDeleteOne = (req, res, next) => {
 
         location.reviews.id(req.params.reviewid).remove();
         location.save((err, location) => {
-            if (err) return utils.customError(err, res);
+            if (err) return utils.customError(err, 400, res);
             doSetAverageRating(location);
-            return res.status(200).json({ "message": `Review ${req.params.reviewid} deleted` })
+            return res.status(204).json(null)
         })
     })
 };

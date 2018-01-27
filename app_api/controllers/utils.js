@@ -1,12 +1,6 @@
-const customError = (err, res) => {
+const customError = (err, statusCode, res) => {
     console.log("\nERROR\n", err);
-    if (err.name == "ValidationError") {
-        return res.status(404).json({ "message": err.message })
-    } else if (err.name == "CastError") {
-        return res.status(404).json({ "message": err.message })
-    } else {
-        return res.status(404).json({ "message": "Sorry, internal error" })
-    }
+    return res.status(statusCode).json({ message: err.message })
 }
 
 module.exports = {

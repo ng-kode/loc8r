@@ -21,7 +21,7 @@ const locationsListByDistance = (req, res, next) => {
     }
     Loc.aggregate([{ $geoNear: geoOptions }], (err, results, stats) => {
         if (err) {
-            return utils.customError(err, res);
+            return utils.customError(err, 400, res);
         }
         const locations = results.map(o => {
             return {
@@ -37,11 +37,40 @@ const locationsListByDistance = (req, res, next) => {
     })
 };
 
+const validateLocation = (location, res) => {
+    if (location.facilities) {
+        try {
+            let facilities = location.facilities.split(",")
+        } catch (e) {
+            return res.status(404).json({ "message": "Invalid facilities format in request body" })
+        }
+    }
+
+    if (location.lng && isNaN(parseFloat(location.lng))) return res.status(404).json({ "message": "lng should be numeric" })
+    if (location.lat && isNaN(parseFloat(location.lat))) return res.status(404).json({ "message": "lat should be numeric" })
+}
+
 const locationsCreate = (req, res, next) => {
+    const reqKeys = Object.keys(req.body);
+    const locationKeys = [
+                            "name",
+                            "address",
+                            "facilities",
+                            "lng",
+                            "lat",
+                            "days1",
+                            "closed1",
+                            "days2",
+                            "closed2"
+                        ]
+    const missingKeys = locationKeys.filter(v => !reqKeys.includes(v))
+    if (missingKeys.length > 0) return res.status(404).json({ "message": `${missingKeys.join(", ")} are missing in the request body` })
+
+    validateLocation(req.body, res);
+
     Loc.create({
         name: req.body.name,
         address: req.body.address,
-        rating: req.body.rating,
         facilities: req.body.facilities.split(","),
         coords: [ parseFloat(req.body.lng), parseFloat(req.body.lat) ],
         openingTimes: [{
@@ -57,7 +86,7 @@ const locationsCreate = (req, res, next) => {
         }],
     }, (err, location) => {
         if (err) {
-            return utils.customError(err, res);
+            return utils.customError(err, 400, res);
         }
         return res.status(201).json(location)
     })
@@ -66,7 +95,7 @@ const locationsCreate = (req, res, next) => {
 const locationsReadOne = (req, res, next) => {
     if (req.params && req.params.locationid) {
         Loc.findById(req.params.locationid).exec((err, location) => {
-            if (err) return utils.customError(err, res);
+            if (err) return utils.customError(err, 400, res);
             if (!location) return res.status(404).json({ "message": "Location id not found" });
 
             return res.status(200).json(location);
@@ -77,15 +106,18 @@ const locationsReadOne = (req, res, next) => {
 };
 
 const locationsUpdateOne = (req, res, next) => {
+    validateLocation(req.body, res)
+
     if (req.params && req.params.locationid) {
         Loc.findById(req.params.locationid).select('-review -rating').exec((err, location) => {
-            if (err) return utils.customError(err, res);
+            if (err) return utils.customError(err, 400, res);
             if (!location) return res.status(404).json({ "message": "Location id not found" });
 
             if (req.body.name) location.name = req.body.name;
             if (req.body.address) location.address = req.body.address;
-            if (req.body.facilities) location.facilities = req.body.facilities.split(",");
-            if (req.body.lng && req.body.lat) location.coords = [ req.body.lng, req.body.lat ];
+            if (req.body.facilities) location.facilities = facilities;
+            if (req.body.lng) location.coords[0] = parseFloat(req.body.lng);
+            if (req.body.lat) location.coords[1] = parseFloat(req.body.lat);
             let openingTimes = []
             if (req.body.days1 && req.body.closed1) {
                 let obj = {
@@ -122,12 +154,12 @@ const locationsDeleteOne = (req, res, next) => {
     if (!req.params.locationid) return res.status(404).json({ "message": "location id is required in url" })
 
     Loc.findById(req.params.locationid).exec((err, location) => {
-        if (err) return utils.customError(err, res);
+        if (err) return utils.customError(err, 400, res);
         if (!location) return res.status(404).json({ "message": "location not found" })
 
         location.remove((err, location) => {
-            if (err) return utils.customError(err, res);
-            res.status(200).json({ deleted: location }); // can also do status 204 to give a no-content response
+            if (err) return utils.customError(err, 400, res);
+            res.status(204).json(null); // can also do status 204 to give a no-content response
         })
     })
 };
