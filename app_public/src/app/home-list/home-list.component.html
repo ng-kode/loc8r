@@ -1,0 +1,17 @@
+<div class="row list-group" *ngFor="let location of locations">
+    <a href="/locations/{{location._id}}" class="col-xs-12 list-group-item">
+        <h3>{{location.name}}</h3>
+        <small>&nbsp;
+            <span class="glyphicon glyphicon-star{{ location.rating > 0 ? '' : '-empty' }}"></span>
+            <span class="glyphicon glyphicon-star{{ location.rating > 1 ? '' : '-empty' }}"></span>
+            <span class="glyphicon glyphicon-star{{ location.rating > 2 ? '' : '-empty' }}"></span>
+            <span class="glyphicon glyphicon-star{{ location.rating > 3 ? '' : '-empty' }}"></span>
+            <span class="glyphicon glyphicon-star{{ location.rating > 4 ? '' : '-empty' }}"></span>
+            <span class="badge pull-right badge-default">{{location.distance | distance}}</span>
+        </small>
+        <p class="address">{{location.address | uppercase}}</p>
+        <p>
+            <span *ngFor="let facility of location.facilities" class="label label-warning" style="margin-left: 5px;">{{facility}}</span>
+        </p>
+    </a>
+</div>
