@@ -33,7 +33,7 @@ const homelist = (req, res, next) => {
     }
     request(options, (err, response, body) => {
         if (err) { return utils.customError(err, res) };
-        if (response.statusCode != 200) {  return utils.customError(body, res, false) };
+        if (response.statusCode != 200) {  return utils.customError(body, res, false, "/") };
 
         renderHomepage(req, res, body);
     })
@@ -59,6 +59,7 @@ const getLocationInfo = (req, res, callback) => {
 
 const renderDetailPage = (req, res, data) => {
     res.render('location-info', {
+        googleapikey: process.env.GOOGLE_API_KEY,
         _id: data._id,
         name: data.name,
         address: data.address,
@@ -81,7 +82,8 @@ const locationInfo = (req, res, next) => {
 
 const renderReviewForm = (req, res, data) => {
     res.render('location-review-form', {
-        title: `Review on ${data.name}`
+        title: `Review on ${data.name}`,
+        error: req.query.error
     })
 }
 
@@ -105,7 +107,7 @@ const doAddReview = (req, res, next) => {
     }
     request(options, (err, response, body) => {
         if (err) return utils.customError(err, res);
-        if (response.statusCode != 201) return utils.customError(body, res, false);
+        if (response.statusCode != 201) return utils.customError(body, res, false, `/locations/${req.params.locationid}/reviews/new?error=${body.message}`);
         if (response.statusCode == 201) {
             return res.redirect(`/locations/${req.params.locationid}`)
         }
