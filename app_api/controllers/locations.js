@@ -25,7 +25,7 @@ const locationsListByDistance = (req, res, next) => {
         }
         const locations = results.map(o => {
             return {
-                distance: o.dist,
+                distance: o.dist.calculated,
                 name: o.name,
                 address: o.address,
                 rating: o.rating,
