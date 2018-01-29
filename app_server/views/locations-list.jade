@@ -17,7 +17,7 @@ block content
                             h3= location.name
                             small &nbsp;
                                 +outputRating(location.rating)                       
-                                span.badge.pull-right.badge-default #{Math.round(location.distance.calculated)}m
+                                span.badge.pull-right.badge-default #{Math.round(location.distance)}m
                             p.address= location.address
                             p
                                 each facility in location.facilities
