@@ -10,24 +10,14 @@ block content
         
     .row
         .col-xs-12.col-sm-8
-            .row.list-group
-                if locations.length
-                    each location in locations
-                        a.col-xs-12.list-group-item(href="/locations/#{location._id}")
-                            h3= location.name
-                            small &nbsp;
-                                +outputRating(location.rating)                       
-                                span.badge.pull-right.badge-default #{Math.round(location.distance.calculated)}m
-                            p.address= location.address
-                            p
-                                each facility in location.facilities
-                                    span.label.label-warning= facility
-                                    &nbsp;
-                else
-                    p No wifi spots nearby
-                
+            app-home-list Loading...
           
         .col-xs-12.col-sm-4
             p.lead= sidebar
+
+block scripts
+    script(src="/build/inline.52e3c8940bb7b0b652d1.bundle.js")
+    script(src="/build/polyfills.f20484b2fa4642e0dca8.bundle.js")
+    script(src="/build/main.7d6d02e90fa10f443346.bundle.js")
 
   
