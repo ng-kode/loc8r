@@ -1,3 +1,5 @@
-<p>
-  about works!
-</p>
+<app-page-header [content]="pageContent.header"></app-page-header>
+<div class="row">
+  <div class="col-12 col-md-8" [innerHtml]="pageContent.content | htmlLineBreaks">
+  </div>
+</div>
