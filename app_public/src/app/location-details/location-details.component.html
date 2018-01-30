@@ -1,0 +1,63 @@
+<div class="row">
+    <div class="col-xs-12 col-sm-6">
+        <p class="rating"><app-rating-stars [rating]="location.rating"></app-rating-stars></p>
+        <p>{{location.address}}</p>
+        <div class="panel panel-primary" *ngFor="let openingTime of location.openingTimes" [ngSwitch]="openingTime.closed">
+            <div class="panel-heading">
+                <h3 class="panel-title">Opening hour</h3>
+            </div>
+            <div class="panel-body">
+                <span *ngSwitchCase="true">closed</span>
+                <span *ngSwitchDefault>{{openingTime.days}}: {{openingTime.opening}} - {{openingTime.closing}}</span>
+            </div>
+        </div>
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">Facilities</h3>
+            </div>
+            <div class="panel-body">
+                <span class="label label-warning" *ngFor="let facility of location.facilities">
+                    <span class="glyphicon glyphicon-ok"></span>{{facility}}
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="col-xs-12 col-sm-6 location-map">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">Location map</h3>
+            </div>
+            <div class="panel-body">
+                <div class="thumbnail">
+                    <img src="https://maps.googleapis.com/maps/api/staticmap?center={{location.coords[1]}},{{location.coords[0]}}&zoom=17&size=400x350&markers={{location.coords[1]}},{{location.coords[0]}}&scale=2&key={{googleapikey}}">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-12">
+        <div class="panel panel-primary review-panel">
+            <div class="panel-heading">
+                <a href="#" class="btn btn-default pull-right">Add Review</a>
+                <h3 class="panel-title">Reviews</h3>
+            </div>
+            <div class="panel-body review-container">
+                <div class="row" *ngFor="let review of location.reviews">
+                    <div class="review">
+                        <div class="well well-sm">
+                            <span class="rating"><app-rating-stars [rating]="review.rating"></app-rating-stars></span>
+                            &nbsp;
+                            <span class="reviewAuthor">{{review.author}}</span>
+                            &nbsp;
+                            <span class="reviewTimestamp">{{review.createdOn}}</span>
+                        </div>
+                        <div class="col-xs-12">
+                            <p>{{review.reviewText}}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

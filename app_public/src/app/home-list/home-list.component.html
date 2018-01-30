@@ -2,7 +2,7 @@
     {{message}}
 </div>
 <div class="row list-group" *ngFor="let location of locations">
-    <a href="/locations/{{location._id}}" class="col-xs-12 list-group-item">
+    <a routerLink="/locations/{{location._id}}" class="col-xs-12 list-group-item">
         <h3>{{location.name}}</h3>
         <small>&nbsp;
             <app-rating-stars [rating]="location.rating"></app-rating-stars>

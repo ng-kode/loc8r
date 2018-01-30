@@ -1,0 +1,9 @@
+<app-page-header [content]="pageContent.header"></app-page-header>
+<div class="row">
+  <div class="col-12 col-md-8">
+    <div class="error"></div>
+    <app-location-details *ngIf="newLocation" [location]="newLocation">Loading...</app-location-details>
+  </div>
+
+  <app-sidebar [content]="pageContent.sidebar | htmlLineBreaks"></app-sidebar>
+</div>
