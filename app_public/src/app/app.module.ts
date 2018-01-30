@@ -13,6 +13,7 @@ import { HomepageComponent } from './homepage/homepage.component';
 import { PageHeaderComponent } from './page-header/page-header.component';
 import { SidebarComponent } from './sidebar/sidebar.component';
 import { HtmlLineBreaksPipe } from './html-line-breaks.pipe';
+import { RatingStarsComponent } from './rating-stars/rating-stars.component';
 
 
 @NgModule({
@@ -24,7 +25,8 @@ import { HtmlLineBreaksPipe } from './html-line-breaks.pipe';
     HomepageComponent,
     PageHeaderComponent,
     SidebarComponent,
-    HtmlLineBreaksPipe
+    HtmlLineBreaksPipe,
+    RatingStarsComponent
   ],
   imports: [
     BrowserModule,
