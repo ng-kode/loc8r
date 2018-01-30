@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Loc8rDataService } from '../loc8r-data.service';
+import { GeolocationService } from '../geolocation.service';
 
 export class Location {
     _id: string;
@@ -14,22 +15,44 @@ export class Location {
   selector: 'app-home-list',
   templateUrl: './home-list.component.html',
   styleUrls: ['./home-list.component.css'],
-  providers: [Loc8rDataService]
+  providers: [GeolocationService, Loc8rDataService]
 })
 export class HomeListComponent implements OnInit {
 
-  constructor(private loc8rDataService: Loc8rDataService) { }
+  constructor(private geolocationService: GeolocationService, private loc8rDataService: Loc8rDataService) { }
 
   locations: Location[];
+  message: string;
 
-  private getLocations(): void {
-      this.loc8rDataService.getLocations().then(foundLocations => {
+  private getLocations(position: any): void {
+      this.message = "Getting wifi locations nearby";
+      const lng = position.coords.longitude;
+      const lat = position.coords.latitude;
+      this.loc8rDataService.getLocations(lng, lat).then(foundLocations => {
+          this.message = "Here you go!"
           this.locations = foundLocations;
       });
   }
 
+  private showError(): void {
+      this.message = "Error with getPosition";
+  }
+
+  private noGeo(): void {
+      this.message = "Navigator geolocation not available";
+  }
+
+  private getPosition(): void {
+      this.message = "Getting your position";
+      this.geolocationService.getPosition(
+          this.getLocations.bind(this),
+          this.showError.bind(this),
+          this.noGeo.bind(this)
+      );
+  }
+
   ngOnInit() {
-      this.getLocations();
+      this.getPosition();
   }
 
 }
