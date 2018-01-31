@@ -2,13 +2,14 @@ import { Injectable } from '@angular/core';
 import { Headers, Http } from '@angular/http';
 import 'rxjs/add/operator/toPromise';
 import { Location, Review } from './location';
+import { environment } from '../environments/environment';
 
 @Injectable()
 export class Loc8rDataService {
 
   constructor(private http: Http) { }
 
-  private apiBaseUrl = `http://localhost:3000/api`;
+  private apiBaseUrl = environment.apiBaseUrl;
 
   public getLocations(lng: number, lat: number): Promise<Location[]> {
       const maxDistance = 250;
