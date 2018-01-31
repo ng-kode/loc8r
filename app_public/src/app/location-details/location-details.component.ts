@@ -1,5 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { Location } from '../home-list/home-list.component';
+import { Location, Review } from '../location';
 import { Loc8rDataService } from '../loc8r-data.service';
 
 @Component({
@@ -15,7 +15,7 @@ export class LocationDetailsComponent implements OnInit {
 
   googleapikey: string = "AIzaSyAOWLiCKLbrQ-z04TyVurAFaeGTjqESShk";
 
-  public newReview = {
+  public newReview: Review = {
       author: '',
       rating: 5,
       reviewText: ''
@@ -42,10 +42,11 @@ export class LocationDetailsComponent implements OnInit {
   public onReviewSubmit(): void {
       this.formError = '';
       if (this.formIsValid()) {
-        this.loc8rDataService.addReviewByLocationId(this.location._id, this.newReview).then(response => {
-            this.location.reviews.unshift(response);
-            this.resetAndHideReviewForm();
-        })
+        this.loc8rDataService.addReviewByLocationId(this.location._id, this.newReview)
+            .then((review: Review) => {
+                this.location.reviews.unshift(review);
+                this.resetAndHideReviewForm();
+            })
       } else {
         this.formError = 'All fields required.';
       }
