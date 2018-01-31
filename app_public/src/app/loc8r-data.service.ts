@@ -11,8 +11,6 @@ export class Loc8rDataService {
   private apiBaseUrl = `http://localhost:3000/api`;
 
   public getLocations(lng: number, lat: number): Promise<Location[]> {
-      // const lng = 114.22120579999999;
-      // const lat = 22.3064319;
       const maxDistance = 250;
       const url = `${this.apiBaseUrl}/locations?lng=${lng}&lat=${lat}&maxDistance=${maxDistance}`;
       return this.http
@@ -22,10 +20,19 @@ export class Loc8rDataService {
         .catch(this.handleError);
   }
 
-  public getLocationById(locationid: any): Promise<Location> {
-      const url = `${this.apiBaseUrl}/locations/${locationid}`
+  public getLocationById(locationid: string): Promise<Location> {
+      const url = `${this.apiBaseUrl}/locations/${locationid}`;
       return this.http
         .get(url)
+        .toPromise()
+        .then(response => response.json() as Location)
+        .catch(this.handleError);
+  }
+
+  public addReviewByLocationId(locationid: string, formData: any): Promise<any> {
+      const url = `${this.apiBaseUrl}/locations/${locationid}/reviews`;
+      return this.http
+        .post(url, formData)
         .toPromise()
         .then(response => response.json() as Location)
         .catch(this.handleError);

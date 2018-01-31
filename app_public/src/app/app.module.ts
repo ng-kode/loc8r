@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
 import { HttpModule } from '@angular/http';
 import { RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 
 
 import { HomeListComponent } from './home-list/home-list.component';
@@ -38,6 +39,7 @@ import { MostRecentFirstPipe } from './most-recent-first.pipe';
     BrowserModule,
     HttpClientModule,
     HttpModule,
+    FormsModule,
     RouterModule.forRoot([
         {
             path: '',
